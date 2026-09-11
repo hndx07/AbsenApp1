@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User-isolated collections: users/{userId}/...
+    match /users/{userId} {
+      allow get, write: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+
+      match /{subcollection}/{docId} {
+        allow read, write: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      }
+    }
+
+    // Root collections with teacherUid check
+    match /classes/{classId} {
+      allow get, list, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
+      allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+    }
+
+    match /attendance_sessions/{sessionId} {
+      allow get, list, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
+      allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+    }
+
+    match /students/{studentId} {
+      allow get, list, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
+      allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+    }
+
+    match /grades/{gradeId} {
+      allow get, list, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
+      allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+    }
+  }
+}

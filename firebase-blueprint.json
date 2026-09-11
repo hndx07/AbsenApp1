@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "ClassRoom": {
+      "title": "ClassRoom",
+      "description": "Data kelas dan mata pelajaran guru",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "namaKelas": { "type": "string", "maxLength": 100 },
+        "mataPelajaran": { "type": "string", "maxLength": 100 },
+        "kkm": { "type": "number" },
+        "jurusan": { "type": "string", "maxLength": 100 },
+        "keterangan": { "type": "string", "maxLength": 255 },
+        "teacherUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "namaKelas", "mataPelajaran"]
+    },
+    "AttendanceSession": {
+      "title": "AttendanceSession",
+      "description": "Sesi presensi pertemuan kelas harian",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "classId": { "type": "string", "maxLength": 128 },
+        "tanggal": { "type": "string", "maxLength": 30 },
+        "pertemuanKe": { "type": "number" },
+        "topikMateri": { "type": "string", "maxLength": 255 },
+        "teacherUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "classId", "tanggal", "pertemuanKe"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Data identitas siswa per kelas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "no": { "type": "number" },
+        "nisn": { "type": "string", "maxLength": 20 },
+        "nama": { "type": "string", "maxLength": 150 },
+        "jenisKelamin": { "type": "string", "enum": ["L", "P"] },
+        "classId": { "type": "string", "maxLength": 128 },
+        "teacherUid": { "type": "string", "maxLength": 128 },
+        "teleponOrtu": { "type": "string", "maxLength": 30 },
+        "alamat": { "type": "string", "maxLength": 255 }
+      },
+      "required": ["id", "no", "nama", "jenisKelamin", "classId"]
+    },
+    "StudentGrade": {
+      "title": "StudentGrade",
+      "description": "Data nilai asesmen formatif dan sumatif siswa",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "classId": { "type": "string", "maxLength": 128 },
+        "formatif1": { "type": "number" },
+        "formatif2": { "type": "number" },
+        "formatif3": { "type": "number" },
+        "formatif4": { "type": "number" },
+        "formatif5": { "type": "number" },
+        "formatif6": { "type": "number" },
+        "formatif7": { "type": "number" },
+        "formatif8": { "type": "number" },
+        "sumatifTengah": { "type": "number" },
+        "sumatifAkhir": { "type": "number" },
+        "catatan": { "type": "string", "maxLength": 255 }
+      },
+      "required": ["id", "studentId", "classId"]
+    },
+    "TeacherProfile": {
+      "title": "TeacherProfile",
+      "description": "Profil guru pengguna aplikasi",
+      "type": "object",
+      "properties": {
+        "namaGuru": { "type": "string", "maxLength": 150 },
+        "nip": { "type": "string", "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 150 },
+        "namaSekolah": { "type": "string", "maxLength": 150 },
+        "mataPelajaranUtama": { "type": "string", "maxLength": 100 },
+        "tahunAjaran": { "type": "string", "maxLength": 20 },
+        "semester": { "type": "string", "enum": ["Ganjil", "Genap"] },
+        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "activeClassId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["namaGuru", "namaSekolah"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/profile/{profileId}": {
+      "schema": "TeacherProfile",
+      "description": "Profil guru terisolasi per akun user"
+    },
+    "/users/{userId}/classes/{classId}": {
+      "schema": "ClassRoom",
+      "description": "Daftar kelas terisolasi per akun guru"
+    },
+    "/users/{userId}/students/{studentId}": {
+      "schema": "Student",
+      "description": "Daftar siswa terisolasi per akun guru"
+    },
+    "/users/{userId}/attendance_sessions/{sessionId}": {
+      "schema": "AttendanceSession",
+      "description": "Daftar sesi presensi kelas terisolasi per akun guru"
+    },
+    "/users/{userId}/grades/{gradeId}": {
+      "schema": "StudentGrade",
+      "description": "Daftar nilai asesmen siswa terisolasi per akun guru"
+    },
+    "/classes/{classId}": {
+      "schema": "ClassRoom",
+      "description": "Koleksi data kelas per guru"
+    },
+    "/attendance_sessions/{sessionId}": {
+      "schema": "AttendanceSession",
+      "description": "Koleksi sesi presensi pertemuan"
+    }
+  }
+}
