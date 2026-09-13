@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" width="100%" height="100%">
+<defs>
+<path id="topArc" d="M 76,256 A 180,180 0 0,1 436,256" fill="none" />
+<path id="bottomArc" d="M 436,256 A 180,180 0 0,1 76,256" fill="none" />
+<g id="atom">
+  <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="#ffffff" stroke-width="1.8" transform="rotate(0)" />
+  <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="#ffffff" stroke-width="1.8" transform="rotate(60)" />
+  <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="#ffffff" stroke-width="1.8" transform="rotate(120)" />
+  <circle cx="0" cy="0" r="5" fill="#2238b8" stroke="#ffffff" stroke-width="1.5" />
+  <path d="M -2,-2 L 2,2 M -2,2 L 2,-2" stroke="#7dd3fc" stroke-width="1.2" />
+</g>
+</defs>
+<path d="M 460.78,201.13 Q 489.69,223.07 502.00,256.00 Q 489.69,288.93 460.78,310.87 Q 474.85,344.33 469.04,379.00 Q 441.92,401.37 405.91,405.91 Q 401.37,441.92 379.00,469.04 Q 344.33,474.85 310.87,460.78 Q 288.93,489.69 256.00,502.00 Q 223.07,489.69 201.13,460.78 Q 167.67,474.85 133.00,469.04 Q 110.63,441.92 106.09,405.91 Q 70.08,401.37 42.96,379.00 Q 37.15,344.33 51.22,310.87 Q 22.31,288.93 10.00,256.00 Q 22.31,223.07 51.22,201.13 Q 37.15,167.67 42.96,133.00 Q 70.08,110.63 106.09,106.09 Q 110.63,70.08 133.00,42.96 Q 167.67,37.15 201.13,51.22 Q 223.07,22.31 256.00,10.00 Q 288.93,22.31 310.87,51.22 Q 344.33,37.15 379.00,42.96 Q 401.37,70.08 405.91,106.09 Q 441.92,110.63 469.04,133.00 Q 474.85,167.67 460.78,201.13 Z" fill="#1e1b24" stroke="#111115" stroke-width="10" stroke-linejoin="round" />
+<path d="M 460.78,201.13 Q 489.69,223.07 502.00,256.00 Q 489.69,288.93 460.78,310.87 Q 474.85,344.33 469.04,379.00 Q 441.92,401.37 405.91,405.91 Q 401.37,441.92 379.00,469.04 Q 344.33,474.85 310.87,460.78 Q 288.93,489.69 256.00,502.00 Q 223.07,489.69 201.13,460.78 Q 167.67,474.85 133.00,469.04 Q 110.63,441.92 106.09,405.91 Q 70.08,401.37 42.96,379.00 Q 37.15,344.33 51.22,310.87 Q 22.31,288.93 10.00,256.00 Q 22.31,223.07 51.22,201.13 Q 37.15,167.67 42.96,133.00 Q 70.08,110.63 106.09,106.09 Q 110.63,70.08 133.00,42.96 Q 167.67,37.15 201.13,51.22 Q 223.07,22.31 256.00,10.00 Q 288.93,22.31 310.87,51.22 Q 344.33,37.15 379.00,42.96 Q 401.37,70.08 405.91,106.09 Q 441.92,110.63 469.04,133.00 Q 474.85,167.67 460.78,201.13 Z" fill="#4b4ded" stroke="#c8ee18" stroke-width="6" stroke-linejoin="round" />
+<text fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="900" letter-spacing="4">
+  <textPath xlink:href="#topArc" startOffset="50%" text-anchor="middle">SMK MUHAMMADIYAH</textPath>
+</text>
+<text fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="900" letter-spacing="3.5">
+  <textPath xlink:href="#bottomArc" startOffset="50%" text-anchor="middle">BAWANG - BATANG</textPath>
+</text>
+<use xlink:href="#atom" x="68" y="285" />
+<use xlink:href="#atom" x="444" y="285" />
+<path d="M 413.62,244.98 L 427.84,248.50 L 427.84,263.50 L 413.62,267.02 L 411.10,286.15 L 423.92,293.23 L 420.04,307.72 L 405.39,307.44 L 398.01,325.26 L 408.57,335.42 L 401.06,348.42 L 386.99,344.35 L 375.24,359.66 L 382.81,372.20 L 372.20,382.81 L 359.66,375.24 L 344.35,386.99 L 348.42,401.06 L 335.42,408.57 L 325.26,398.01 L 307.44,405.39 L 307.72,420.04 L 293.23,423.92 L 286.15,411.10 L 267.02,413.62 L 263.50,427.84 L 248.50,427.84 L 244.98,413.62 L 225.85,411.10 L 218.77,423.92 L 204.28,420.04 L 204.56,405.39 L 186.74,398.01 L 176.58,408.57 L 163.58,401.06 L 167.65,386.99 L 152.34,375.24 L 139.80,382.81 L 129.19,372.20 L 136.76,359.66 L 125.01,344.35 L 110.94,348.42 L 103.43,335.42 L 113.99,325.26 L 106.61,307.44 L 91.96,307.72 L 88.08,293.23 L 100.90,286.15 L 98.38,267.02 L 84.16,263.50 L 84.16,248.50 L 98.38,244.98 L 100.90,225.85 L 88.08,218.77 L 91.96,204.28 L 106.61,204.56 L 113.99,186.74 L 103.43,176.58 L 110.94,163.58 L 125.01,167.65 L 136.76,152.34 L 129.19,139.80 L 139.80,129.19 L 152.34,136.76 L 167.65,125.01 L 163.58,110.94 L 176.58,103.43 L 186.74,113.99 L 204.56,106.61 L 204.28,91.96 L 218.77,88.08 L 225.85,100.90 L 244.98,98.38 L 248.50,84.16 L 263.50,84.16 L 267.02,98.38 L 286.15,100.90 L 293.23,88.08 L 307.72,91.96 L 307.44,106.61 L 325.26,113.99 L 335.42,103.43 L 348.42,110.94 L 344.35,125.01 L 359.66,136.76 L 372.20,129.19 L 382.81,139.80 L 375.24,152.34 L 386.99,167.65 L 401.06,163.58 L 408.57,176.58 L 398.01,186.74 L 405.39,204.56 L 420.04,204.28 L 423.92,218.77 L 411.10,225.85 Z" fill="#c4c6cb" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" />
+<circle cx="256" cy="256" r="125" fill="#111113" stroke="#a1a4ac" stroke-width="4" />
+<polygon points="300.9,252.4 374.0,256.0 300.9,259.6" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="300.3,264.1 350.7,281.4 298.4,271.1" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="296.6,275.3 358.2,315.0 293.0,281.5" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="290.3,285.2 325.3,325.3 285.2,290.3" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="281.5,293.0 315.0,358.2 275.3,296.6" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="271.1,298.4 281.4,350.7 264.1,300.3" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="259.6,300.9 256.0,374.0 252.4,300.9" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="247.9,300.3 230.6,350.7 240.9,298.4" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="236.7,296.6 197.0,358.2 230.5,293.0" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="226.8,290.3 186.7,325.3 221.7,285.2" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="219.0,281.5 153.8,315.0 215.4,275.3" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="213.6,271.1 161.3,281.4 211.7,264.1" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="211.1,259.6 138.0,256.0 211.1,252.4" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="211.7,247.9 161.3,230.6 213.6,240.9" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="215.4,236.7 153.8,197.0 219.0,230.5" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="221.7,226.8 186.7,186.7 226.8,221.7" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="230.5,219.0 197.0,153.8 236.7,215.4" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="240.9,213.6 230.6,161.3 247.9,211.7" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="252.4,211.1 256.0,138.0 259.6,211.1" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="264.1,211.7 281.4,161.3 271.1,213.6" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="275.3,215.4 315.0,153.8 281.5,219.0" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="285.2,221.7 325.3,186.7 290.3,226.8" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="293.0,230.5 358.2,197.0 296.6,236.7" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<polygon points="298.4,240.9 350.7,230.6 300.3,247.9" fill="#000000" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" />
+<g transform="translate(256, 305)">
+  <path d="M -52,22 C -45,-5 -25,-18 0,-5 C 25,-18 45,-5 52,22 L 40,25 C 32,5 18,2 0,12 C -18,2 -32,5 -40,25 Z" fill="#111113" stroke="#ffffff" stroke-width="2" />
+  <path d="M -38,24 L -38,36 C -20,32 -8,38 0,40 C 8,38 20,32 38,36 L 38,24 C 20,22 10,24 0,25 C -10,24 -20,22 -38,24 Z" fill="#09090b" stroke="#ffffff" stroke-width="2" />
+  <path d="M -22,12 C -12,2 -4,2 0,5 C 4,2 12,2 22,12" fill="none" stroke="#5260ff" stroke-width="3" opacity="0.9" />
+</g>
+<circle cx="256" cy="248" r="44" fill="#ffffff" stroke="#111113" stroke-width="3" />
+<circle cx="300.0" cy="248.0" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="296.7" cy="264.8" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="287.1" cy="279.1" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="272.8" cy="288.7" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="256.0" cy="292.0" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="239.2" cy="288.7" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="224.9" cy="279.1" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="215.3" cy="264.8" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="212.0" cy="248.0" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="215.3" cy="231.2" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="224.9" cy="216.9" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="239.2" cy="207.3" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="256.0" cy="204.0" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="272.8" cy="207.3" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="287.1" cy="216.9" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<circle cx="296.7" cy="231.2" r="4" fill="#ffffff" stroke="#111113" stroke-width="1.5" />
+<g transform="translate(256, 248)">
+  <!-- Central authentic Arabic calligraphy text -->
+  <text x="0" y="11" font-family="'Amiri', 'Traditional Arabic', 'Scheherazade New', 'Noto Naskh Arabic', serif" font-size="35" font-weight="bold" text-anchor="middle" fill="#111113">محمدية</text>
+</g>
+</svg>

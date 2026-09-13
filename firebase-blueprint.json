@@ -116,6 +116,10 @@
     "/attendance_sessions/{sessionId}": {
       "schema": "AttendanceSession",
       "description": "Koleksi sesi presensi pertemuan"
+    },
+    "/teacher_workspaces/{workspaceId}": {
+      "schema": "TeacherProfile",
+      "description": "Backup workspace per guru terisolasi UID"
     }
   }
 }

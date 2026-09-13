@@ -2,6 +2,9 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  signInWithCredential,
   GoogleAuthProvider,
   onAuthStateChanged,
   User,
@@ -43,6 +46,112 @@ export interface UnauthorizedDomainError extends Error {
   projectId: string;
   consoleUrl: string;
 }
+
+export const checkUnauthorizedDomainError = (error: any): UnauthorizedDomainError | null => {
+  const currentDomain = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const isDomainError =
+    error?.code === 'auth/unauthorized-domain' ||
+    (error?.message && error.message.includes('unauthorized-domain'));
+
+  if (isDomainError) {
+    const customErr = new Error(
+      `Domain preview "${currentDomain}" belum didaftarkan di Authorized Domains Firebase Console (${firebaseConfig.projectId}).`
+    ) as UnauthorizedDomainError;
+    customErr.code = 'auth/unauthorized-domain';
+    customErr.isUnauthorizedDomain = true;
+    customErr.domain = currentDomain;
+    customErr.projectId = firebaseConfig.projectId;
+    customErr.consoleUrl = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
+    return customErr;
+  }
+  return null;
+};
+
+/**
+ * A. Metode Popup Sinkron (Dipanggil Langsung dari Event Klik / User Gesture)
+ * Tidak menggunakan await fetch/setTimeout sebelum signInWithPopup sehingga tidak diblokir browser.
+ */
+export const signInWithGooglePopupDirect = (): Promise<{
+  user: any;
+  accessToken: string;
+}> => {
+  isSigningIn = true;
+  // Panggil langsung saat event klik tombol terjadi
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      cachedAccessToken = credential?.accessToken || null;
+      cachedUser = result.user;
+      return { user: result.user, accessToken: cachedAccessToken || '' };
+    })
+    .catch((error) => {
+      const domainErr = checkUnauthorizedDomainError(error);
+      if (domainErr) throw domainErr;
+      throw error;
+    })
+    .finally(() => {
+      isSigningIn = false;
+    });
+};
+
+/**
+ * B. Metode Redirect (Memindahkan halaman langsung ke Google OAuth tanpa membuka popup)
+ * Solusi 100% bebas blokir browser di HP / Android / WebView / Browser ketat.
+ */
+export const signInWithGoogleRedirectMethod = async (): Promise<void> => {
+  isSigningIn = true;
+  try {
+    await signInWithRedirect(auth, provider);
+  } catch (error: any) {
+    isSigningIn = false;
+    const domainErr = checkUnauthorizedDomainError(error);
+    if (domainErr) throw domainErr;
+    throw error;
+  }
+};
+
+/**
+ * Memeriksa hasil redirect saat halaman kembali dimuat (getRedirectResult)
+ */
+export const checkGoogleRedirectResult = async (): Promise<{
+  user: any;
+  accessToken: string;
+} | null> => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      cachedAccessToken = credential?.accessToken || null;
+      cachedUser = result.user;
+      return { user: result.user, accessToken: cachedAccessToken || '' };
+    }
+    return null;
+  } catch (error: any) {
+    const domainErr = checkUnauthorizedDomainError(error);
+    if (domainErr) throw domainErr;
+    console.error('Error in getRedirectResult:', error);
+    throw error;
+  }
+};
+
+/**
+ * C. Autentikasi dengan ID Token dari Google Identity Services (GIS) Button
+ */
+export const signInWithGoogleIdToken = async (
+  idToken: string
+): Promise<{ user: any; accessToken: string }> => {
+  try {
+    const credential = GoogleAuthProvider.credential(idToken);
+    const result = await signInWithCredential(auth, credential);
+    cachedAccessToken = idToken;
+    cachedUser = result.user;
+    return { user: result.user, accessToken: idToken };
+  } catch (error: any) {
+    const domainErr = checkUnauthorizedDomainError(error);
+    if (domainErr) throw domainErr;
+    throw error;
+  }
+};
 
 export const initGoogleWorkspaceAuth = (
   onSuccess?: (user: any, token: string) => void,

@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 import {
   TeacherProfile,
   ClassRoom,
@@ -8,6 +9,15 @@ import {
   StudentGrade,
   TeacherWorkspaceData,
 } from '../types';
+
+/**
+ * Sanitize object to remove undefined values before sending to Firestore
+ */
+function sanitizeForFirestore<T>(data: T): T {
+  return JSON.parse(
+    JSON.stringify(data, (_, value) => (value === undefined ? null : value))
+  );
+}
 
 /**
  * Cloud Storage Service for Multi-Device Persistence
@@ -64,8 +74,7 @@ export const CloudStorage = {
 
     const { teacherUid, email } = payload;
 
-
-    // 1. Save to email-isolated local cache immediately
+    // 1. Save to email-isolated local cache immediately (always reliable offline)
     try {
       const cacheKey = this.getEmailCacheKey(email || teacherUid);
       localStorage.setItem(cacheKey, JSON.stringify(payload));
@@ -73,19 +82,44 @@ export const CloudStorage = {
       console.warn('Failed to cache workspace locally:', e);
     }
 
-    // 2. Persist to Firestore cloud database so data is accessible across devices
-    if (!teacherUid) {
-      console.warn('No teacher UID provided for cloud storage save');
-      return false;
+    // 2. Persist to Firestore cloud database only if authenticated
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      // User is not signed in to Firebase Auth yet, local cache is preserved
+      return true;
     }
 
+    const targetUid = currentUser.uid;
+    const sanitizedPayload = sanitizeForFirestore({
+      ...payload,
+      teacherUid: targetUid,
+      email: currentUser.email || email,
+    });
+
+    const path = `teacher_workspaces/${targetUid}`;
     try {
-      const docRef = doc(db, 'teacher_workspaces', teacherUid);
-      await setDoc(docRef, payload, { merge: true });
-      console.log(`[CloudStorage] Successfully saved workspace for ${email} to Firestore`);
+      const docRef = doc(db, 'teacher_workspaces', targetUid);
+      await setDoc(docRef, sanitizedPayload, { merge: true });
+
+      // Also mirror to user-isolated collection
+      const userDocRef = doc(db, 'users', targetUid, 'workspace', 'current');
+      await setDoc(userDocRef, sanitizedPayload, { merge: true });
+
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[CloudStorage] Error saving workspace to Firestore:', error);
+      // If permission error occurs, route through handleFirestoreError for diagnostic tracing
+      if (
+        error?.code === 'permission-denied' ||
+        error?.message?.includes('permission')
+      ) {
+        try {
+          handleFirestoreError(error, OperationType.WRITE, path);
+        } catch (thrownErr) {
+          // Keep failure non-fatal to the client UI so the user can continue working offline
+          console.warn('[CloudStorage] Diagnostic error report:', thrownErr);
+        }
+      }
       return false;
     }
   },
@@ -100,14 +134,17 @@ export const CloudStorage = {
   ): Promise<TeacherWorkspaceData | null> {
     const cacheKey = this.getEmailCacheKey(email || teacherUid);
 
-    // 1. Try reading from Firestore (cross-device truth)
-    if (teacherUid) {
+    // 1. Try reading from Firestore if authenticated
+    const currentUser = auth.currentUser;
+    const targetUid = currentUser ? currentUser.uid : teacherUid;
+
+    if (currentUser && targetUid) {
+      const path = `teacher_workspaces/${targetUid}`;
       try {
-        const docRef = doc(db, 'teacher_workspaces', teacherUid);
+        const docRef = doc(db, 'teacher_workspaces', targetUid);
         const snapshot = await getDoc(docRef);
         if (snapshot.exists()) {
           const cloudData = snapshot.data() as TeacherWorkspaceData;
-          console.log(`[CloudStorage] Retrieved cloud workspace for ${email} from Firestore`);
           // Update local cache
           try {
             localStorage.setItem(cacheKey, JSON.stringify(cloudData));
@@ -115,11 +152,19 @@ export const CloudStorage = {
             console.warn('Failed to update local cache:', e);
           }
           return cloudData;
-        } else {
-          console.log(`[CloudStorage] No existing cloud workspace document for ${email} yet.`);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.warn('[CloudStorage] Firestore read error, checking local cache:', error);
+        if (
+          error?.code === 'permission-denied' ||
+          error?.message?.includes('permission')
+        ) {
+          try {
+            handleFirestoreError(error, OperationType.GET, path);
+          } catch (thrownErr) {
+            console.warn('[CloudStorage] Diagnostic error report:', thrownErr);
+          }
+        }
       }
     }
 

@@ -364,6 +364,23 @@ export const FirestoreService = {
   },
 
   /**
+   * Batch save or update multiple student grades
+   */
+  async saveAllGrades(uid: string, grades: StudentGrade[]): Promise<void> {
+    if (!grades || grades.length === 0) return;
+    const batch = writeBatch(db);
+    grades.forEach((grade) => {
+      const docRef = doc(db, 'users', uid, 'grades', grade.id);
+      batch.set(
+        docRef,
+        sanitizeForFirestore({ ...grade, teacherUid: uid }),
+        { merge: true }
+      );
+    });
+    await batch.commit();
+  },
+
+  /**
    * Reset all user data back to default SMK demo dataset
    */
   async resetUserData(

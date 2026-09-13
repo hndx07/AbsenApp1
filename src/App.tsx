@@ -11,7 +11,9 @@ import {
 import { Storage } from './utils/storage';
 import { CloudStorage } from './services/cloudStorage';
 import { FirestoreService } from './services/firestoreService';
-import { GoogleWorkspaceAuthResult } from './utils/googleWorkspace';
+import { GoogleWorkspaceAuthResult, signOutGoogleWorkspace } from './utils/googleWorkspace';
+import { auth } from './lib/firebase';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 
 // Components
 import { Navbar } from './components/Navbar';
@@ -24,6 +26,8 @@ import { AttendanceSessionModal } from './components/AttendanceSessionModal';
 import { SpreadsheetImportModal } from './components/SpreadsheetImportModal';
 import { LoginModal } from './components/LoginModal';
 import { WhatsAppShareModal } from './components/WhatsAppShareModal';
+import { LoginPage } from './components/LoginPage';
+import { CloudLoadingScreen } from './components/CloudLoadingScreen';
 
 // Views
 import { AttendanceView } from './components/AttendanceView';
@@ -45,9 +49,16 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('absensi');
   const [isCloudSaving, setIsCloudSaving] = useState(false);
+  const [isLoadingCloud, setIsLoadingCloud] = useState(false);
+  const [cloudStatusMessage, setCloudStatusMessage] = useState('Menghubungkan ke Cloud Firestore...');
 
   // Google Workspace & Auth State
   const [workspaceAuth, setWorkspaceAuth] = useState<GoogleWorkspaceAuthResult | null>(null);
+
+  // Front Page Mode (Active when logged out or when user requests front page)
+  const [isFrontPageMode, setIsFrontPageMode] = useState<boolean>(
+    () => !Storage.getTeacher().isLoggedIn
+  );
 
   // Toast Notification State
   const [toast, setToast] = useState<{
@@ -132,6 +143,53 @@ export default function App() {
     return map;
   }, [allGrades, currentClass.id]);
 
+  // Listen to Firebase Auth state for automatic Google authentication and cloud data pull
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        setIsLoadingCloud(true);
+        setCloudStatusMessage(`Menghubungkan akun Google ${firebaseUser.email}...`);
+        try {
+          let userData = await FirestoreService.loadUserData(firebaseUser.uid);
+          if (!userData.classes || userData.classes.length === 0) {
+            setCloudStatusMessage('Menyiapkan data sekolah SMK Muhammadiyah Bawang...');
+            userData = await FirestoreService.seedInitialUserData(firebaseUser.uid, {
+              displayName: firebaseUser.displayName,
+              email: firebaseUser.email,
+              photoURL: firebaseUser.photoURL,
+            });
+          }
+
+          setClasses(userData.classes);
+          setActiveClassId(userData.activeClassId || userData.classes[0]?.id || '');
+          setAllStudents(userData.students);
+          setAllSessions(userData.sessions);
+          setAllGrades(userData.grades);
+
+          const syncedTeacher: TeacherProfile = {
+            ...userData.teacher,
+            id: firebaseUser.uid,
+            namaGuru: firebaseUser.displayName || userData.teacher.namaGuru || 'Guru SMK',
+            email: firebaseUser.email || userData.teacher.email || '',
+            avatarUrl: firebaseUser.photoURL || userData.teacher.avatarUrl || '',
+            isLoggedIn: true,
+          };
+          setTeacher(syncedTeacher);
+          Storage.setTeacher(syncedTeacher);
+          setIsFrontPageMode(false);
+          showToast(`Berhasil masuk sebagai ${syncedTeacher.namaGuru} (${firebaseUser.email}).`, 'success');
+        } catch (err: any) {
+          console.error('Error fetching Firestore user data:', err);
+          showToast(`Gagal mengunduh data Firestore: ${err.message || 'Koneksi lambat'}. Menggunakan cache offline.`, 'error');
+        } finally {
+          setIsLoadingCloud(false);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [showToast]);
+
   // Auto-Persist to LocalStorage
   useEffect(() => {
     Storage.setTeacher(teacher);
@@ -157,15 +215,17 @@ export default function App() {
     Storage.setAllGrades(allGrades);
   }, [allGrades]);
 
-  // Auto-sync with Cloud Storage (Firestore) if logged in
+  // Auto-sync with Cloud Storage (Firestore) if logged in with Firebase Auth
   const syncToCloud = useCallback(async () => {
-    if (!teacher.isLoggedIn || !teacher.id) return;
+    if (!teacher.isLoggedIn || !auth.currentUser) return;
     setIsCloudSaving(true);
     try {
+      const currentUid = auth.currentUser.uid;
+      const currentEmail = auth.currentUser.email || teacher.email || '';
       await CloudStorage.saveWorkspace({
-        teacherUid: teacher.id,
-        email: teacher.email || '',
-        teacher,
+        teacherUid: currentUid,
+        email: currentEmail,
+        teacher: { ...teacher, id: currentUid, email: currentEmail },
         classes,
         activeClassId,
         students: allStudents,
@@ -521,21 +581,70 @@ export default function App() {
     setConfirmModalConfig({
       isOpen: true,
       title: 'Konfirmasi Keluar',
-      description: 'Apakah Anda yakin ingin keluar dari akun Google? Data lokal tetap tersimpan di browser ini.',
+      description: 'Apakah Anda yakin ingin keluar dari akun Google? Anda akan dialihkan ke halaman login.',
       actionLabel: 'Keluar',
       isDestructive: true,
-      onConfirm: () => {
-        setTeacher((prev) => ({
-          ...prev,
+      onConfirm: async () => {
+        try {
+          await signOutGoogleWorkspace();
+        } catch (err) {
+          console.warn('Sign out warning:', err);
+        }
+        const loggedOutTeacher: TeacherProfile = {
+          ...teacher,
           isLoggedIn: false,
-          email: '',
-          avatarUrl: '',
-        }));
+        };
+        setTeacher(loggedOutTeacher);
+        Storage.setTeacher(loggedOutTeacher);
         setWorkspaceAuth(null);
-        showToast('Anda telah keluar dari akun.', 'info');
+        setIsFrontPageMode(true);
+        showToast('Anda telah berhasil keluar dari akun Google.', 'info');
       },
     });
   };
+
+  // Cloud Loading Screen while data is syncing from Firestore
+  if (isLoadingCloud) {
+    return (
+      <CloudLoadingScreen
+        userEmail={teacher.email || 'Akun Google'}
+        userName={teacher.namaGuru || 'Guru SMK'}
+        statusMessage={cloudStatusMessage}
+      />
+    );
+  }
+
+  // Dedicated Front Page / Landing Page for Login (Google Only & Minimalist)
+  if (isFrontPageMode || !teacher.isLoggedIn) {
+    return (
+      <>
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            linkUrl={toast.linkUrl}
+            linkLabel={toast.linkLabel}
+            onClose={() => setToast(null)}
+          />
+        )}
+        <LoginPage
+          currentTeacher={teacher}
+          onLoginSuccess={(updatedTeacher, authResult) => {
+            setTeacher(updatedTeacher);
+            Storage.setTeacher(updatedTeacher);
+            if (authResult) {
+              setWorkspaceAuth(authResult);
+            }
+            setIsFrontPageMode(false);
+            showToast(
+              `Selamat datang di SIM Guru, ${updatedTeacher.namaGuru || 'Bapak/Ibu Guru'}!`,
+              'success'
+            );
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased">
@@ -564,6 +673,7 @@ export default function App() {
         onResetData={handleResetData}
         onDeleteClass={handleDeleteClassPrompt}
         onLogout={handleLogout}
+        onOpenFrontPage={() => setIsFrontPageMode(true)}
       />
 
       {/* Main Content Area */}

@@ -16,9 +16,9 @@ service cloud.firestore {
 
     // User-isolated collections: users/{userId}/...
     match /users/{userId} {
-      allow get, write: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow read, write: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
 
-      match /{subcollection}/{docId} {
+      match /{allPaths=**} {
         allow read, write: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
       }
     }
@@ -42,6 +42,11 @@ service cloud.firestore {
     match /grades/{gradeId} {
       allow get, list, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
       allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+    }
+
+    // Workspace backup collection per teacher UID
+    match /teacher_workspaces/{workspaceId} {
+      allow read, write: if isSignedIn() && isValidId(workspaceId) && request.auth.uid == workspaceId;
     }
   }
 }

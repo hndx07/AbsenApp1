@@ -39,7 +39,7 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
       className={`inline-flex items-center justify-center shrink-0 overflow-hidden ${sizeClasses[size]} ${className}`}
     >
       <img
-        src="/logo-smk.png"
+        src="/logo-smk.svg"
         alt={alt}
         onError={() => setHasError(true)}
         className={`w-full h-full object-contain drop-shadow-xs ${imgClassName}`}
